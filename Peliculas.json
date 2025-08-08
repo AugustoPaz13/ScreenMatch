@@ -1,0 +1,26 @@
+[
+  {
+    "Nombre": "The Batman",
+    "FechaEstreno": 2022,
+    "Duracion": 17,
+    "IncluidoEnElPlan": false,
+    "SumaClasificaciones": 0.0,
+    "CantidadCalificaciones": 0
+  },
+  {
+    "Nombre": "Man of Steel",
+    "FechaEstreno": 2013,
+    "Duracion": 14,
+    "IncluidoEnElPlan": false,
+    "SumaClasificaciones": 0.0,
+    "CantidadCalificaciones": 0
+  },
+  {
+    "Nombre": "Matrix",
+    "FechaEstreno": 1993,
+    "Duracion": 60,
+    "IncluidoEnElPlan": false,
+    "SumaClasificaciones": 0.0,
+    "CantidadCalificaciones": 0
+  }
+]
