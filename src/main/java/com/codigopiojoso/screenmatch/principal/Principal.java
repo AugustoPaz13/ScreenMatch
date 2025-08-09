@@ -15,6 +15,7 @@ public class Principal {
     private final String API_KEY = System.getenv("API_KEY");
     private SerieRepository serieRepository;
     private List<Serie> series;
+    private Optional<Serie> serieBuscada;
     public Principal(SerieRepository repository) {
         this.serieRepository = repository;
     }
@@ -26,12 +27,15 @@ public class Principal {
             System.out.println("Bienvenido a Screenmatch");
             System.out.println("1. Buscar una serie");
             System.out.println("2. Buscar episodios");
-            System.out.println("3. Buscar serie por título");
-            System.out.println("4. Buscar serie por categoría");
-            System.out.println("5. Mostrar series buscadas");
-            System.out.println("6. TOP 3 MEJORES SERIES");
-            System.out.println("7. Buscar una película");
-            System.out.println("8. Salir");
+            System.out.println("3. Buscar episodios por título");
+            System.out.println("4. Buscar serie por título");
+            System.out.println("5. Buscar serie por categoría");
+            System.out.println("6. Mostrar series buscadas");
+            System.out.println("7. TOP 3 MEJORES SERIES");
+            System.out.println("8. TOP 3 MEJORES EPISODIOS");
+            System.out.println("9. Filtrar series");
+            System.out.println("10. Buscar una película");
+            System.out.println("11. Salir");
             System.out.println("------------------------------------");
             System.out.print("Seleccione una opción: ");
             try {
@@ -40,12 +44,15 @@ public class Principal {
                 switch (opcion) {
                     case 1 -> buscarSerie();
                     case 2 -> buscarEpisodios();
-                    case 3 -> buscarSeriePorTitulo();
-                    case 4 -> buscarSeriePorCategoria();
-                    case 5 -> mostrarSeriesBuscadas();
-                    case 6 -> topSeries();
-                    case 7 -> buscarPelicula();
-                    case 8 -> {
+                    case 3 -> buscarEpisodiosPorTitulo();
+                    case 4 -> buscarSeriePorTitulo();
+                    case 5 -> buscarSeriePorCategoria();
+                    case 6 -> mostrarSeriesBuscadas();
+                    case 7 -> topSeries();
+                    case 8 -> topEpisodios();
+                    case 9 -> filtrarSeriesPorTemporadaYClasificacion();
+                    case 10 -> buscarPelicula();
+                    case 11 -> {
                         System.out.println("Saliendo de la aplicación...");
                         return;
                     }
@@ -137,7 +144,7 @@ public class Principal {
     private void buscarSeriePorTitulo() {
         System.out.print("Ingrese el título de la serie: ");
         String nombreSerie = consola.nextLine();
-        Optional<Serie> serieBuscada = serieRepository.findByTituloContainsIgnoreCase(nombreSerie);
+        serieBuscada = serieRepository.findByTituloContainsIgnoreCase(nombreSerie);
 
         if (serieBuscada.isPresent()) {
             System.out.println("Serie encontrada: \n" + serieBuscada.get());
@@ -162,5 +169,65 @@ public class Principal {
         System.out.println("Series en la categoría " + categoria + ":");
         seriesPorCategoria.forEach(s -> System.out.println("Título: " + s.getTitulo() + " / Clasificación: " + s.getClasificacion()));
 
+    }
+
+    public void filtrarSeriesPorTemporadaYClasificacion(){
+        System.out.println("¿Filtrar séries con cuántas temporadas? ");
+        System.out.print("Temporadas: ");
+        var totalTemporadas = consola.nextInt();
+        consola.nextLine();
+        System.out.println("¿Con clasificación apartir de cuánto? ");
+        System.out.print("Clasificación: ");
+        var clasificacion = consola.nextDouble();
+        consola.nextLine();
+        List<Serie> filtroSeries = serieRepository.seriesPorTemporadaYClasificacion(totalTemporadas,clasificacion);
+        System.out.println("""
+                ----------------
+                SERIES FILTRADAS
+                ----------------
+                """);
+        filtroSeries.forEach(s ->
+                System.out.println(s.getTitulo() + "  - clasificación: " + s.getClasificacion()));
+    }
+
+    public void buscarEpisodiosPorTitulo() {
+        System.out.print("Ingrese el título del episodio: ");
+        String nombreEpisodio = consola.nextLine();
+        List<Episodio> episodiosEncontrados = serieRepository.episodiosPorNombre(nombreEpisodio);
+
+        if (episodiosEncontrados.isEmpty()) {
+            System.out.println("No se encontraron episodios con el título: " + nombreEpisodio);
+        } else {
+            System.out.println("Episodios encontrados:");
+            episodiosEncontrados.forEach(e -> System.out.printf("""
+                    -------------------------------
+                    Episodio: %s
+                    Temporada: %d
+                    Número de episodio: %d
+                    Fecha de lanzamiento: %s
+                    Clasificación: %.1f
+                    """, e.getTitulo(), e.getTemporada(), e.getNumeroEpisodio(), e.getFechaDeLanzamiento(), e.getClasificacion()));
+        }
+    }
+
+    public void topEpisodios() {
+        buscarSeriePorTitulo();
+        if(serieBuscada.isPresent()){
+            Serie serie = serieBuscada.get();
+            List<Episodio> topEpisodios = serieRepository.top3Episodios(serie);
+            if (topEpisodios.isEmpty()) {
+                System.out.println("No se encontraron episodios para la serie: " + serie.getTitulo());
+            } else {
+                System.out.println("Top 3 episodios de la serie " + serie.getTitulo() + ":");
+                topEpisodios.forEach(e -> System.out.printf("""
+                        -------------------------------
+                        Episodio: %s
+                        Temporada: %d
+                        Número de episodio: %d
+                        Fecha de lanzamiento: %s
+                        Clasificación: %.1f
+                        """, e.getTitulo(), e.getTemporada(), e.getNumeroEpisodio(), e.getFechaDeLanzamiento(), e.getClasificacion()));
+            }
+        }
     }
 }
