@@ -1,27 +1,25 @@
 package com.codigopiojoso.screenmatch.model;
-
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 
 @Entity
 @Table(name = "episodios")
 public class Episodio {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long Id;
     private Integer temporada;
     private String titulo;
     private Integer numeroEpisodio;
     private Double clasificacion;
     private LocalDate fechaDeLanzamiento;
-
     @ManyToOne
     private Serie serie;
 
-    public Episodio() {
-    }
-
+    public Episodio(){}
     public Episodio(Integer numero, DatosEpisodio d) {
         this.temporada = numero;
         this.titulo = d.titulo();
@@ -31,11 +29,20 @@ public class Episodio {
         }catch (NumberFormatException e){
             this.clasificacion = 0.0;
         }
-        try {
+        try{
             this.fechaDeLanzamiento = LocalDate.parse(d.fechaDeLanzamiento());
-        } catch (Exception e) {
+        } catch (DateTimeParseException e){
             this.fechaDeLanzamiento = null;
         }
+
+    }
+
+    public Long getId() {
+        return Id;
+    }
+
+    public void setId(Long id) {
+        Id = id;
     }
 
     public Serie getSerie() {
