@@ -1,5 +1,6 @@
 package com.codigopiojoso.screenmatch.repository;
 
+import com.codigopiojoso.screenmatch.dto.EpisodioDTO;
 import com.codigopiojoso.screenmatch.model.Categoria;
 import com.codigopiojoso.screenmatch.model.Episodio;
 import com.codigopiojoso.screenmatch.model.Serie;
@@ -26,4 +27,10 @@ public interface SerieRepository extends JpaRepository<Serie,Long> {
 
     @Query("SELECT e FROM Serie s JOIN s.episodios e WHERE s = :serie ORDER BY e.clasificacion DESC LIMIT 3")
     List<Episodio> top3Episodios(Serie serie);
+
+    @Query("SELECT s FROM Serie s " + "JOIN s.episodios e " + "GROUP BY s " + "ORDER BY MAX(e.fechaDeLanzamiento) DESC LIMIT 3")
+    List<Serie> lanzamientosMasRecientes();
+
+    @Query("SELECT e FROM Serie s JOIN s.episodios e WHERE s.id = :id AND e.temporada = :numeroTemporada")
+    List<Episodio> getTemporadasByNumber(Long id, Long numeroTemporada);
 }
